@@ -86,3 +86,31 @@ fields present.
 - Do **not** put `OPENAI_API_KEY` in the app or in any `EXPO_PUBLIC_*` variable.
 - Do **not** commit `.env` (only `.env.example`).
 - Do **not** disable rate limiting.
+
+---
+
+## Render deploy failed? (troubleshooting)
+
+1. **Open the failed deploy log** in Render → `future-self-diary-api` → Events → click the failed deploy → read the **Build** log (not just the summary).
+
+2. **Common fixes (already in latest `render.yaml`):**
+   - `NODE_VERSION=20` — Next.js 15 needs Node 20+.
+   - `buildCommand: npm install --include=dev && npm run build` — ensures TypeScript is available during build.
+   - `rootDir: backend` — build runs inside the backend folder.
+
+3. **OPENAI_API_KEY on Render:**
+   - Blueprint → Environment → add `OPENAI_API_KEY` (secret) if it was skipped during first sync.
+   - Without it, the service may build but reflection requests return 500.
+
+4. **Manual sync after a fix:**
+   - Push to GitHub → Render Blueprint `self-diary` → **Manual sync**.
+
+5. **Blueprint vs manual Web Service:**
+   If Blueprint keeps failing, create a **Web Service** manually:
+   - Root Directory: `backend`
+   - Build: `npm install --include=dev && npm run build`
+   - Start: `npm start`
+   - Health check path: `/health`
+   - Same env vars as the table above.
+
+6. **Free tier cold start:** first request after idle can take 30–60s. That is normal.

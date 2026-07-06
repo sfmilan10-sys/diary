@@ -1,30 +1,29 @@
 # Render Blueprint for the Future Self Diary backend (temporary testing).
-# In Render: New + → Blueprint → connect this repo. Render reads this file.
+# In Render: Blueprint → Manual sync after pushing fixes.
 #
-# OPENAI_API_KEY is intentionally NOT stored here. It is marked `sync: false`,
-# so Render will prompt you to enter it as a secret in the dashboard.
+# OPENAI_API_KEY is NOT stored here — set it in the Render dashboard (sync: false).
 services:
   - type: web
     name: future-self-diary-api
     runtime: node
     rootDir: backend
     plan: free
-    buildCommand: npm install && npm run build
+    # Install devDependencies for the build, then compile Next.js.
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /health
     autoDeploy: true
     envVars:
+      - key: NODE_VERSION
+        value: "20"
       - key: NODE_ENV
         value: production
       - key: OPENAI_MODEL
         value: gpt-5.5
-      # Empty = allow mobile / no-Origin requests (the React Native app sends no Origin).
-      - key: ALLOWED_ORIGINS
-        value: ""
       - key: REFLECTION_RATE_LIMIT_WINDOW_MS
         value: "900000"
       - key: REFLECTION_RATE_LIMIT_MAX
         value: "20"
-      # Secret — enter the value in the Render dashboard, never in this file.
+      # Secret — paste your key in the Render dashboard when prompted.
       - key: OPENAI_API_KEY
         sync: false
